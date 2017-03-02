@@ -50,35 +50,13 @@
             return [r * 255, g * 255, b * 255];
         }
 
-        var namedColors = [];
-
-        function redrawCanvas() {
-            var c = document.getElementById("palette");
-            var ctx = c.getContext("2d");
-
-            // First, clear canvas.
-            ctx.clearRect(0, 0, c.width, c.height);
-
-            // Get named colors from textarea.
-            var textarea = document.getElementById("color-names");
-            var lines = textarea.value.replace(/\r\n/g, "\n").split("\n")
-            namedColors = [];
-            lines.map(function forLine(line) {
-                var elems = line.split(";");
-                namedColors.push({ hex: parseInt(elems[0], 16), name: elems[1] });
-            });
-        }
-
-        function getMousePosition(canvas, evt) {
-            var rect = canvas.getBoundingClientRect();
-            return {
-                x: Math.round(evt.clientX - rect.left),
-                y: Math.round(evt.clientY - rect.top)
+        function colorFromRGBArray(rgb) {
+            function paddedHex(c) {
+                n = Math.max(0, Math.min(c, 255));
+                return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
             }
+            return "#" + paddedHex(rgb[0]) + paddedHex(rgb[1]) + paddedHex(rgb[2]);
         }
-
-        var canvas = document.getElementById("palette");
-        var context = canvas.getContext("2d");
 
         function colorFromLocation(loc, canvas) {
             var hue = loc.x / canvas.width;
@@ -101,13 +79,44 @@
             return rgb;
         }
 
-        function colorFromRGBArray(rgb) {
-            function paddedHex(c) {
-                n = Math.max(0, Math.min(c, 255));
-                return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
+        var namedColors = [];
+
+        function redrawCanvas() {
+            var c = document.getElementById("palette");
+            var ctx = c.getContext("2d");
+
+            // First, clear canvas.
+            ctx.clearRect(0, 0, c.width, c.height);
+
+            // Get named colors from textarea.
+            var textarea = document.getElementById("color-names");
+            var lines = textarea.value.replace(/\r\n/g, "\n").split("\n")
+            namedColors = [];
+            lines.map(function (line) {
+                var elems = line.split(";");
+                namedColors.push({ hex: parseInt(elems[0], 16), name: elems[1] });
+            });
+
+            for (var i = 1; i <= c.height; i++) {
+                for (var j = 1; j <= c.width; j++) {
+                    var displayedColor = colorFromLocation({x:j,y:i}, c);
+                    ctx.fillStyle = colorFromRGBArray(displayedColor);
+
+                    ctx.fillRect(j, i, 1, 1);
+                }
             }
-            return "#" + paddedHex(rgb[0]) + paddedHex(rgb[1]) + paddedHex(rgb[2]);
         }
+
+        function getMousePosition(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.round(evt.clientX - rect.left),
+                y: Math.round(evt.clientY - rect.top)
+            }
+        }
+
+        var canvas = document.getElementById("palette");
+        var context = canvas.getContext("2d");
 
         canvas.addEventListener("mousemove", function(evt) {
             var mousePos = getMousePosition(canvas, evt);
