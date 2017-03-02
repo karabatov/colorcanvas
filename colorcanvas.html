@@ -14,7 +14,7 @@
     </tr>
     </table>
     <canvas id="palette" width="800" height="600" style="border:1px solid #000000;"></canvas>
-    <br /><button onlick="redrawCanvas()">Redraw</button><br />
+    <br /><button onclick="redrawCanvas()">Redraw</button><br />
     <textarea id="color-names" rows=20 cols=50></textarea>
 
     <script language="javascript">
@@ -49,12 +49,24 @@
 
             return [r * 255, g * 255, b * 255];
         }
+
+        var namedColors = [];
+
         function redrawCanvas() {
             var c = document.getElementById("palette");
             var ctx = c.getContext("2d");
 
             // First, clear canvas.
             ctx.clearRect(0, 0, c.width, c.height);
+
+            // Get named colors from textarea.
+            var textarea = document.getElementById("color-names");
+            var lines = textarea.value.replace(/\r\n/g, "\n").split("\n")
+            namedColors = [];
+            lines.map(function forLine(line) {
+                var elems = line.split(";");
+                namedColors.push({ hex: parseInt(elems[0], 16), name: elems[1] });
+            });
         }
 
         function getMousePosition(canvas, evt) {
