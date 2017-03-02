@@ -2,14 +2,14 @@
     <table style="border:1px solid #000000;">
     <tr>
         <td>Displayed color</td>
-        <td id="displayed-color-hex">#.......</td>
+        <td id="displayed-color-hex" style="width:70pt">#.......</td>
         <td id="displayed-color-bucket"></td>
         <td></td>
     </tr>
     <tr>
         <td>Named color</td>
         <td id="named-color-hex">#.......</td>
-        <td id="named-color-bucket" style="width:60pt"></td>
+        <td id="named-color-bucket" style="width:70pt"></td>
         <td id="named-color-name">NAME</td>
     </tr>
     </table>
@@ -18,6 +18,37 @@
     <textarea id="color-names" rows=20 cols=50></textarea>
 
     <script language="javascript">
+        /**
+         * Converts an HSV color value to RGB. Conversion formula
+         * adapted from http://en.wikipedia.org/wiki/HSV_color_space.
+         * Assumes h, s, and v are contained in the set [0, 1] and
+         * returns r, g, and b in the set [0, 255].
+         *
+         * @param   Number  h       The hue
+         * @param   Number  s       The saturation
+         * @param   Number  v       The value
+         * @return  Array           The RGB representation
+         */
+        function hsvToRgb(h, s, v){
+            var r, g, b;
+
+            var i = Math.floor(h * 6);
+            var f = h * 6 - i;
+            var p = v * (1 - s);
+            var q = v * (1 - f * s);
+            var t = v * (1 - (1 - f) * s);
+
+            switch(i % 6){
+                case 0: r = v, g = t, b = p; break;
+                case 1: r = q, g = v, b = p; break;
+                case 2: r = p, g = v, b = t; break;
+                case 3: r = p, g = q, b = v; break;
+                case 4: r = t, g = p, b = v; break;
+                case 5: r = v, g = p, b = q; break;
+            }
+
+            return [r * 255, g * 255, b * 255];
+        }
         function redrawCanvas() {
             var c = document.getElementById("palette");
             var ctx = c.getContext("2d");
@@ -37,9 +68,42 @@
         var canvas = document.getElementById("palette");
         var context = canvas.getContext("2d");
 
+        function colorFromLocation(loc, canvas) {
+            var hue = loc.x / canvas.width;
+            var white = 0;
+            var saturation = 1;
+
+            var locY = loc.y / canvas.height;
+            var halfBoundsY = canvas.height / 2;
+            if (locY >= 0 && locY <= 0.5) {
+                saturation = loc.y / halfBoundsY * 0.9 + 0.1;
+                white = 255;
+            } else if (locY > 0.5 && locY <= 1.0) {
+                white = (1 - (loc.y - halfBoundsY) / halfBoundsY) * 255;
+            }
+
+            var rgb = hsvToRgb(hue, 1.0, saturation);
+            rgb[0] += white * (1 - saturation);
+            rgb[1] += white * (1 - saturation);
+            rgb[2] += white * (1 - saturation);
+            return rgb;
+        }
+
+        function colorFromRGBArray(rgb) {
+            function paddedHex(c) {
+                n = Math.max(0, Math.min(c, 255));
+                return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
+            }
+            return "#" + paddedHex(rgb[0]) + paddedHex(rgb[1]) + paddedHex(rgb[2]);
+        }
+
         canvas.addEventListener("mousemove", function(evt) {
             var mousePos = getMousePosition(canvas, evt);
-            console.log(mousePos.x + ", " + mousePos.y);
+
+            var displayColor = colorFromLocation(mousePos, canvas);
+            var displayColorHex = colorFromRGBArray(displayColor);
+            document.getElementById("displayed-color-bucket").style.backgroundColor = displayColorHex;
+            document.getElementById("displayed-color-hex").innerHTML = displayColorHex;
         }, false);
 
         redrawCanvas();
