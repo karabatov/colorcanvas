@@ -15,7 +15,9 @@
     </table>
     <canvas id="palette" width="800" height="600" style="border:1px solid #000000;"></canvas>
     <br /><button onclick="redrawCanvas()">Redraw</button><br />
-    <textarea id="color-names" rows=20 cols=50></textarea>
+    <textarea id="color-names" rows=20 cols=50></textarea><br />
+    <p>Unused colors:</p><br />
+    <textarea id="unused-colors" rows=20 cols=50></textarea>
 
     <script language="javascript">
         /**
@@ -50,11 +52,12 @@
             return [r * 255, g * 255, b * 255];
         }
 
+        function paddedHex(c) {
+            n = Math.max(0, Math.min(c, 255));
+            return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
+        }
+
         function colorFromRGBArray(rgb) {
-            function paddedHex(c) {
-                n = Math.max(0, Math.min(c, 255));
-                return "0123456789ABCDEF".charAt((n - n % 16) / 16) + "0123456789ABCDEF".charAt(n % 16);
-            }
             return "#" + paddedHex(rgb[0]) + paddedHex(rgb[1]) + paddedHex(rgb[2]);
         }
 
@@ -130,6 +133,20 @@
                     ctx.fillRect(j, i, 1, 1);
                 }
             }
+
+            // Filter unused colors.
+            for (var key in matchedColors) {
+                var namedColor = matchedColors[key];
+                var maybeIndex = namedColors.indexOf(namedColor);
+                if (maybeIndex != -1) {
+                    namedColors.splice(maybeIndex, 1);
+                }
+            }
+            document.getElementById("unused-colors").value = namedColors
+                .map(function (namedColor) {
+                    return "0x" + paddedHex(namedColor.rgb[0]) + paddedHex(namedColor.rgb[1]) + paddedHex(namedColor.rgb[2]);
+                })
+                .join("\n");
         }
 
         function getMousePosition(canvas, evt) {
