@@ -14,15 +14,16 @@
     </tr>
     </table>
     <canvas id="palette" width="800" height="600" style="border:1px solid #000000;"></canvas>
-    <br /><button onlick="redrawCanvas()">Redraw</button>
+    <br /><button onlick="redrawCanvas()">Redraw</button><br />
+    <textarea id="color-names" rows=20 cols=50></textarea>
 
     <script language="javascript">
         function redrawCanvas() {
             var c = document.getElementById("palette");
             var ctx = c.getContext("2d");
-            ctx.moveTo(0,0);
-            ctx.lineTo(200,100);
-            ctx.stroke();
+
+            // First, clear canvas.
+            ctx.clearRect(0, 0, c.width, c.height);
         }
 
         function getMousePosition(canvas, evt) {
@@ -36,7 +37,7 @@
         var canvas = document.getElementById("palette");
         var context = canvas.getContext("2d");
 
-        canvas.addEventListener('mousemove', function(evt) {
+        canvas.addEventListener("mousemove", function(evt) {
             var mousePos = getMousePosition(canvas, evt);
             console.log(mousePos.x + ", " + mousePos.y);
         }, false);
