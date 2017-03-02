@@ -150,6 +150,7 @@
             var displayColorHex = colorFromRGBArray(displayColor);
             document.getElementById("displayed-color-bucket").style.backgroundColor = displayColorHex;
             document.getElementById("displayed-color-hex").innerHTML = displayColorHex;
+
             var matchedColor = matchedColors[displayColorHex];
             var matchedColorHex = colorFromRGBArray(matchedColor.rgb);
             document.getElementById("named-color-bucket").style.backgroundColor = matchedColorHex;
