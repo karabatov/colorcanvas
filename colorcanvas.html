@@ -58,6 +58,14 @@
             return "#" + paddedHex(rgb[0]) + paddedHex(rgb[1]) + paddedHex(rgb[2]);
         }
 
+        function rgbArrayFromInt(hexInt) {
+            return [
+                (hexInt & 0xFF0000) >> 16,
+                (hexInt & 0x00FF00) >> 8,
+                (hexInt & 0x0000FF)
+            ]
+        }
+
         function colorFromLocation(loc, canvas) {
             var hue = loc.x / canvas.width;
             var white = 0;
@@ -79,7 +87,12 @@
             return rgb;
         }
 
+        function distanceBetweenRGBArrays(a, b) {
+            return Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2);
+        }
+
         var namedColors = [];
+        var matchedColors = [];
 
         function redrawCanvas() {
             var c = document.getElementById("palette");
@@ -91,17 +104,29 @@
             // Get named colors from textarea.
             var textarea = document.getElementById("color-names");
             var lines = textarea.value.replace(/\r\n/g, "\n").split("\n")
+
             namedColors = [];
+            matchedColors = [];
+
             lines.map(function (line) {
                 var elems = line.split(";");
-                namedColors.push({ hex: parseInt(elems[0], 16), name: elems[1] });
+                namedColors.push({ rgb: rgbArrayFromInt(parseInt(elems[0], 16)), name: elems[1] });
             });
 
+            // Draw found named colors.
             for (var i = 1; i <= c.height; i++) {
+                console.log("row = " + i);
                 for (var j = 1; j <= c.width; j++) {
                     var displayedColor = colorFromLocation({x:j,y:i}, c);
-                    ctx.fillStyle = colorFromRGBArray(displayedColor);
 
+                    // Sort named colors array by distance to displayed color.
+                    namedColors.sort(function (a, b) {
+                        return distanceBetweenRGBArrays(a.rgb, displayedColor) - distanceBetweenRGBArrays(b.rgb, displayedColor);
+                    });
+
+                    var namedColor = namedColors[0];
+                    matchedColors[colorFromRGBArray(displayedColor)] = namedColor;
+                    ctx.fillStyle = colorFromRGBArray(namedColor.rgb);
                     ctx.fillRect(j, i, 1, 1);
                 }
             }
@@ -125,6 +150,11 @@
             var displayColorHex = colorFromRGBArray(displayColor);
             document.getElementById("displayed-color-bucket").style.backgroundColor = displayColorHex;
             document.getElementById("displayed-color-hex").innerHTML = displayColorHex;
+            var matchedColor = matchedColors[displayColorHex];
+            var matchedColorHex = colorFromRGBArray(matchedColor.rgb);
+            document.getElementById("named-color-bucket").style.backgroundColor = matchedColorHex;
+            document.getElementById("named-color-hex").innerHTML = matchedColorHex;
+            document.getElementById("named-color-name").innerHTML = matchedColor.name;
         }, false);
 
         redrawCanvas();
