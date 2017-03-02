@@ -1,0 +1,30 @@
+<body>
+    <table style="border:1px solid #000000;">
+    <tr>
+        <td>Displayed color</td>
+        <td id="displayed-color-hex">#.......</td>
+        <td id="displayed-color-bucket"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Named color</td>
+        <td id="named-color-hex">#.......</td>
+        <td id="named-color-bucket" style="width:60pt"></td>
+        <td id="named-color-name">NAME</td>
+    </tr>
+    </table>
+    <canvas id="palette" width="800" height="600" style="border:1px solid #000000;"></canvas>
+    <br /><button onlick="redrawCanvas()">Redraw</button>
+
+    <script language="javascript">
+        function redrawCanvas() {
+            var c = document.getElementById("palette");
+            var ctx = c.getContext("2d");
+            ctx.moveTo(0,0);
+            ctx.lineTo(200,100);
+            ctx.stroke();
+        }
+
+        redrawCanvas();
+    </script>
+</body>
