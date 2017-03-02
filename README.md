@@ -10,7 +10,7 @@ the nearest named color through Euclidean distance and draws that instead.
 When hovering over the graph, actual color from the color space is displayed on
 the top as well as the nearest matched color.
 
-![ColorCanvas screenshot](screeshot.png?raw=true "ColorCanvas in action")
+![ColorCanvas screenshot](screenshot.png?raw=true "ColorCanvas in action")
 
 ## Sample input
 
