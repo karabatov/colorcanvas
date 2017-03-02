@@ -25,6 +25,22 @@
             ctx.stroke();
         }
 
+        function getMousePosition(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.round(evt.clientX - rect.left),
+                y: Math.round(evt.clientY - rect.top)
+            }
+        }
+
+        var canvas = document.getElementById("palette");
+        var context = canvas.getContext("2d");
+
+        canvas.addEventListener('mousemove', function(evt) {
+            var mousePos = getMousePosition(canvas, evt);
+            console.log(mousePos.x + ", " + mousePos.y);
+        }, false);
+
         redrawCanvas();
     </script>
 </body>
