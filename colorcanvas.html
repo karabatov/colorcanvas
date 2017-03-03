@@ -117,20 +117,29 @@
             });
 
             // Draw found named colors.
-            for (var i = 1; i <= c.height; i++) {
-                console.log("row = " + i);
-                for (var j = 1; j <= c.width; j++) {
+            for (var j = 1; j <= c.width; j++) {
+                console.log("column = " + j + "/" + c.width);
+                var lastColor = null;
+                for (var i = 1; i <= c.height; i++) {
                     var displayedColor = colorFromLocation({x:j,y:i}, c);
 
-                    // Sort named colors array by distance to displayed color.
-                    namedColors.sort(function (a, b) {
-                        return distanceBetweenRGBArrays(a.rgb, displayedColor) - distanceBetweenRGBArrays(b.rgb, displayedColor);
-                    });
+                    if (lastColor == null
+                            || lastColor[0] != displayedColor[0]
+                            || lastColor[1] != displayedColor[1]
+                            || lastColor[2] != displayedColor[2])
+                    {
+                        // Sort named colors array by distance to displayed color.
+                        namedColors.sort(function (a, b) {
+                            return distanceBetweenRGBArrays(a.rgb, displayedColor) - distanceBetweenRGBArrays(b.rgb, displayedColor);
+                        });
+                    }
 
                     var namedColor = namedColors[0];
                     matchedColors[colorFromRGBArray(displayedColor)] = namedColor;
                     ctx.fillStyle = colorFromRGBArray(namedColor.rgb);
                     ctx.fillRect(j, i, 1, 1);
+
+                    lastColor = displayedColor;
                 }
             }
 
