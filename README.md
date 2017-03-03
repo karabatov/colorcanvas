@@ -5,7 +5,7 @@ with named colors.
 
 An image of the tool in action. When provided a list of colors and matching
 names, for each point (color) in the given color space ColorCanvas determines
-the nearest named color through Euclidean distance and draws that instead.
+the nearest named color through squared Euclidean distance and draws that instead.
 
 When hovering over the graph, actual color from the color space is displayed on
 the top as well as the nearest matched color.
